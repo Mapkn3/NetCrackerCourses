@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE group SYSTEM "D:\IdeaProject\Java8\src\xml\xml\group.dtd">
+
+<group>
+    <student firstname="Arthur" lastname="Kogan" groupnumber="6211">
+        <subject title="Math" mark="5"/>
+        <subject title="Physic" mark="4"/>
+        <subject title="Programming" mark="5"/>
+        <subject title="Security" mark="5"/>
+        <average>4.75</average>
+    </student>
+    <student firstname="Rita" lastname="Valkyr" groupnumber="636">
+        <subject title="Math" mark="5"/>
+        <subject title="Physic" mark="5"/>
+        <subject title="Programming" mark="4"/>
+        <average>5</average>
+    </student>
+</group>

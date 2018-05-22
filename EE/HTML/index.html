@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+<body>
+<div id="employee">
+    <div id="id_search">
+        <form id="emp_id_search">
+            <label for="emp_id">Номер сотрудника</label>
+            <input type="text" id="emp_id">
+            <button type="submit" form="emp_id_search">Поиск по номеру</button>
+        </form>
+    </div>
+    <div id="name_search">
+        <form id="emp_name_search">
+            <label for="emp_name">Имя сотрудника</label>
+            <input type="text" id="emp_name">
+            <button type="submit" form="emp_name_search">Поиск по имени</button>
+        </form>
+    </div>
+    <button>Показать всех</button>
+    <a>Создать нового сотрудника</a>
+    <table border="1px" cellspacing="0">
+        <thead>
+        <tr>
+            <td></td>
+            <td>Номер</td>
+            <td>Имя</td>
+            <td>Должность</td>
+            <td>Дата принятия на работу</td>
+            <td>Департамент</td>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="table_checkbox"><input type="checkbox"></td>
+            <td class="table_id">12345</td>
+            <td class="table_name">Боб</td>
+            <td class="table_post">сотрудник</td>
+            <td class="table_date">12.06.2005</td>
+            <td class="table_department">главный офис</td>
+            <td class="table_delete"><a>Удалить</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
