@@ -1,0 +1,253 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 31.03.2016, 17:26:30
+    Author     : Nikolay
+*/
+
+
+a {
+    color: black;
+}
+
+body {
+    background-color: #E0F6D4;
+    font-size: 16px;
+    font-family: "Arial", serif !important;
+}
+
+#main1 {
+    background-color: white;
+    vertical-align: middle;
+    min-height: 100px;
+    width: 960px;
+    height: 500px;
+
+}
+
+#main2 {
+    vertical-align: top;
+    float: left;
+    min-height: 100px;
+    width: 600px;
+}
+
+#wrapper{
+    background-color: white;
+    width:960px;
+    margin:0 auto; 
+    text-align:left;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+} 
+
+#header {
+    background-color: #699A4B;
+}
+
+#info {
+    float: right;
+    height: 104px;
+    width: 350px;
+    background-color: #B1CF9F;
+}
+
+#menu {
+    vertical-align: top;
+    background-color: whitesmoke;
+    width: 350px;
+    min-height: 100px;
+    height: auto;
+}
+
+#info table {
+    padding: 0 0 0;
+    width: 350px;
+}
+
+a.button, input[type="submit"], input[type="button"] {
+    display: inline-block;
+    padding: 5px 15px;
+    font-size: 16px;
+    font-family: "Bitter",serif;
+    line-height: 1.8;
+    vertical-align: bottom;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+a.button, input[type="submit"]:focus, input[type="button"]:focus {
+    outline: none
+}
+a.button, input[type="submit"], input[type="button"] {
+    color: #fff;
+    background-color: #699A4B;
+    text-shadow: -1px 1px #417cb8;
+    border: none;
+}
+a.button, 
+input[type="submit"]:hover,
+input[type="submit"].hover,
+input[type="button"]:hover,
+input[type="button"].hover{
+    background-color: #B1CF9F;
+    text-shadow: -1px 1px #27496d;
+}
+a.button, 
+input[type="submit"]:active,
+input[type="submit"].active,
+input[type="button"]:hover,
+input[type="button"].active{
+    background-color: #27496d;
+    text-shadow: -1px 1px #193047;
+}
+
+input[type="text"], 
+input[type="password"], 
+input[type="date"],
+input[type="number"] {
+    border: 1px solid #cccccc;
+    background: #ffffff !important;
+    outline: none;
+    height: 20px;
+    width: 300px;
+}
+
+select {
+    border: 1px solid #cccccc;
+    background: #ffffff !important;
+    outline: none;
+    width: 302px;
+    min-height: 20px;
+}
+
+.view {
+    width: 100%;
+}
+
+.view th {
+    font-size: 14px;
+    font-weight: normal;
+    color: #039;
+    border-bottom: 2px solid #6678b1;
+    padding: 10px 8px;
+}
+
+.view td {
+    border-bottom: 1px solid #ccc;
+    color: #669;
+    padding: 9px 8px;
+}
+
+.view tr:hover td{
+    color: #6699ff;
+}
+
+.input_panel {
+    margin: 50px auto;
+    border: solid 1px #cccccc;
+    box-shadow:  0 0 5px rgba(0,0,0,.2);
+}
+
+.rightalign {
+    float: right;
+    vertical-align: top;
+}
+
+.sortable {
+    width: 100%;
+}
+.sortable th {
+    font-size: 14px;
+    font-weight: normal;
+    color: #039;
+    border-bottom: 2px solid #6678b1;
+    padding: 10px 8px;
+    text-align:left;
+}
+.sortable th h3 {
+    margin: 0 0 0 0;
+    font-size:12px;
+}
+.sortable td {
+    font-size: 11px;
+    border-bottom: 1px solid #ccc;
+    color: #669;
+    padding: 9px 8px;
+}
+.sortable .head h3 {
+    background:url(../images/sort.gif) 7px center no-repeat;
+    cursor:pointer;
+    padding-left:18px
+}
+.sortable .desc, .sortable .asc {
+    border-top: 2px solid #6678b1;
+}
+.sortable .desc h3 {
+    background:url(../images/desc.gif) 7px center no-repeat;
+    cursor:pointer;
+    padding-left:18px
+}
+.sortable .asc h3 {
+    background:url(../images/asc.gif) 7px  center no-repeat; 
+    cursor:pointer;
+    padding-left:18px
+}
+.sortable .head:hover,
+.sortable .desc:hover,
+.sortable .asc:hover {
+    color: #6699ff;
+}
+.sortable .evenrow td {
+    background:#fff
+}
+.sortable .oddrow td {
+    background:#fff
+}
+.sortable td.evenselected {
+    background:#ecf2f6
+}
+.sortable td.oddselected {
+    background:#ecf2f6
+}
+
+#controls {
+    font-size: 10px; 
+    width:100%;
+    margin:0 auto;
+    height:20px
+}
+#perpage {
+    float:left;
+    vertical-align: top;
+}
+#perpage select {
+    float:left; 
+    font-size:11px
+}
+#perpage span {
+    float:left;
+    margin:2px 0 0 5px
+}
+#navigation {
+    vertical-align: top;
+    float:right;
+    text-align:center
+}
+#navigation img {
+    cursor:pointer
+}
+#text {
+    float:right;
+    vertical-align: top;
+    text-align:right;
+    margin-top:2px
+}
