@@ -1,184 +1,199 @@
 package buildings.office;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import myException.*;
-import myInterface.*;
+import myException.SpaceIndexOutOfBoundsException;
+import myInterface.Floor;
+import myInterface.Space;
 import myIterator.FloorIterator;
 
+import java.io.Serializable;
+import java.util.Iterator;
+
 public class OfficeFloor implements Floor, Serializable, Cloneable {
-    private NodeOfficeFloor head;
-    
-    private NodeOfficeFloor getNode(int index) {
-	if (index < 0) {
+    private OfficeNode head;
+
+    public OfficeFloor(int count) {
+        try {
+            for (int i = 0; i < count; i++) {
+                this.addNode(i, new OfficeNode());
+            }
+        } catch (SpaceIndexOutOfBoundsException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public OfficeFloor(Space[] offices) {
+        try {
+            for (int i = 0; i < offices.length; i++) {
+                addNode(i, new OfficeNode(offices[i]));
+            }
+        } catch (SpaceIndexOutOfBoundsException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private OfficeNode getNode(int index) throws SpaceIndexOutOfBoundsException {
+        if (index < 0) {
             throw new SpaceIndexOutOfBoundsException();
-	}
-	NodeOfficeFloor temp = this.head;
-	for (;  index > 0; index--) {
+        }
+        OfficeNode temp = this.head;
+        for (int i = 0; i < index; i++) {
             temp = temp.getNext();
             if (temp == this.head) {
-		throw new SpaceIndexOutOfBoundsException();
+                throw new SpaceIndexOutOfBoundsException();
             }
-	}
-	return temp;
+        }
+        return temp;
     }
-    private void addNode(int index, NodeOfficeFloor floor) {
-	try {
+
+    private void addNode(int index, OfficeNode floor) throws SpaceIndexOutOfBoundsException {
+        try {
             if (this.head != null) {
-		NodeOfficeFloor prev;
-		if (index == 0) {
-                    for (prev = this.head; prev.getNext() != this.head; prev = prev.getNext()) {}
-		} else {
+                OfficeNode prev;
+                if (index == 0) {
+                    prev = this.head;
+                    while (prev.getNext() != this.head) {
+                        prev = prev.getNext();
+                    }
+                } else {
                     prev = this.getNode(index - 1);
-		}
-		floor.setNext(prev.getNext());
-		prev.setNext(floor);
-		if (index == 0) {
+                }
+                floor.setNext(prev.getNext());
+                prev.setNext(floor);
+                if (index == 0) {
                     this.head = floor;
-		}
+                }
             } else {
                 this.head = floor;
                 this.head.setNext(head);
             }
-	}
-	catch (SpaceIndexOutOfBoundsException e) {
+        } catch (SpaceIndexOutOfBoundsException e) {
             throw e;
         }
     }
-    private void deleteNode(int index) {
-	try {
-            NodeOfficeFloor del = this.getNode(index);
-            NodeOfficeFloor prev;
-            for (prev = del; prev.getNext() != del; prev = prev.getNext()) {}
-		prev.setNext(del.getNext());
-		del.setNext(null);
-		del.setOffice(null);
+
+    private void deleteNode(int index) throws SpaceIndexOutOfBoundsException {
+        try {
+            OfficeNode del = this.getNode(index);
+            OfficeNode prev = del;
+            while (prev.getNext() != del) {
+                prev = prev.getNext();
+            }
+            prev.setNext(del.getNext());
+            del.setNext(null);
+            del.setOffice(null);
+        } catch (SpaceIndexOutOfBoundsException e) {
+            throw e;
         }
-        catch (SpaceIndexOutOfBoundsException e) {
-            throw e;
-	}
     }
-    
-    public OfficeFloor(int count) {
-	try {
-            for (int i = 0; i < count; i++) {
-		this.addNode(i, new NodeOfficeFloor());
-            }
-	}
-	catch (SpaceIndexOutOfBoundsException e) {
-            throw e;
-	}
-    }
-    public OfficeFloor(Space[] offices) {
-	try {
-            for (int i = 0; i < offices.length; i++) {
-		addNode(i, new NodeOfficeFloor(offices[i]));
-            }
-	}
-	catch (SpaceIndexOutOfBoundsException e) {
-            throw e;
-	}
-    }
-    
+
     @Override
     public int getCount() {
-	int count = 1;
-	if (this.head != null) {
-            for (NodeOfficeFloor temp = this.head; temp.getNext() != this.head; count++, temp = temp.getNext()) {}
-	}
-	return count;
+        int count = 0;
+        if (this.head != null) {
+            OfficeNode temp = this.head;
+            do {
+                count++;
+                temp = temp.getNext();
+            } while (temp != this.head);
+        }
+        return count;
     }
+
     @Override
     public double getTotalSquare() {
         double square = 0;
-	NodeOfficeFloor temp = this.head;
-	do {
+        OfficeNode temp = this.head;
+        do {
             square += temp.getOffice().getSquare();
             temp = temp.getNext();
-	} while (temp != this.head);
-	return square;
+        } while (temp != this.head);
+        return square;
     }
+
     @Override
     public int getTotalRooms() {
-	int rooms = 0;
-	NodeOfficeFloor temp = this.head;
-	do
-        {
+        int rooms = 0;
+        OfficeNode temp = this.head;
+        do {
             rooms += temp.getOffice().getCountRooms();
             temp = temp.getNext();
-	} while (temp != this.head);
-	return rooms;
+        } while (temp != this.head);
+        return rooms;
     }
+
     @Override
     public Space[] getSpaces() {
-	Space[] offices = new Office[this.getCount()];
-	NodeOfficeFloor temp = this.head;
-	for (int i = 0; i < this.getCount(); i++) {
+        Space[] offices = new Office[this.getCount()];
+        OfficeNode temp = this.head;
+        for (int i = 0; i < this.getCount(); i++) {
             offices[i] = temp.getOffice();
             temp = temp.getNext();
-	}
-	return offices;
+        }
+        return offices;
     }
+
     @Override
     public Space getSpace(int index) {
-        NodeOfficeFloor temp = this.head;
-	for (; index > 0; index--) {
+        OfficeNode temp = this.head;
+        for (; index > 0; index--) {
             temp = temp.getNext();
             if (temp == this.head) {
-		throw new SpaceIndexOutOfBoundsException();
+                throw new SpaceIndexOutOfBoundsException();
             }
-	}
-	return temp.getOffice();
+        }
+        return temp.getOffice();
     }
+
     @Override
     public void setSpace(int index, Space newSpace) {
-	NodeOfficeFloor temp = this.head;
-	for (; index > 0; index--) {
+        OfficeNode temp = this.head;
+        for (; index > 0; index--) {
             temp = temp.getNext();
             if (temp == this.head) {
-		throw new SpaceIndexOutOfBoundsException();
+                throw new SpaceIndexOutOfBoundsException();
             }
-	}
-	temp.setOffice(newSpace);
+        }
+        temp.setOffice(newSpace);
     }
+
     @Override
     public void addSpace(int index, Space newSpace) {
-	try {
-            this.addNode(index, new NodeOfficeFloor());
+        try {
+            this.addNode(index, new OfficeNode());
             this.setSpace(index, newSpace);
-	}
-	catch (SpaceIndexOutOfBoundsException e) {
+        } catch (SpaceIndexOutOfBoundsException e) {
             throw e;
-	}
+        }
     }
+
     @Override
     public void deleteSpace(int index) {
-	try {
+        try {
             this.setSpace(index, null);
             this.deleteNode(index);
-        }
-	catch (SpaceIndexOutOfBoundsException e) {
+        } catch (SpaceIndexOutOfBoundsException e) {
             throw e;
-	}
+        }
     }
+
     @Override
     public Space getBestSpace() {
-	NodeOfficeFloor temp = this.head;
-	Space bestSpaceOffice = temp.getOffice();
-	for (int i = 0; i < this.getCount(); i++) {
+        OfficeNode temp = this.head;
+        Space bestSpaceOffice = temp.getOffice();
+        for (int i = 0; i < this.getCount(); i++) {
             temp = temp.getNext();
             if (temp.getOffice().getSquare() > bestSpaceOffice.getSquare()) {
-		bestSpaceOffice = temp.getOffice();
+                bestSpaceOffice = temp.getOffice();
             }
-	}
-	return bestSpaceOffice;
+        }
+        return bestSpaceOffice;
     }
 
     @Override
     public Iterator<Space> iterator() {
         return new FloorIterator(this);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder("OfficeFloor");
@@ -189,12 +204,12 @@ public class OfficeFloor implements Floor, Serializable, Cloneable {
         str.append(")");
         return str.toString();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         boolean isEquals = false;
         if (object.getClass() == OfficeFloor.class) {
-            OfficeFloor officeFloor = (OfficeFloor)object;
+            OfficeFloor officeFloor = (OfficeFloor) object;
             if (officeFloor.getCount() == this.getCount()) {
                 for (int i = 0; i < officeFloor.getCount(); i++) {
                     if (!officeFloor.getSpace(i).equals(this.getSpace(i))) {
@@ -215,13 +230,13 @@ public class OfficeFloor implements Floor, Serializable, Cloneable {
         }
         return hash;
     }
-    
+
     @Override
     public Object clone() throws CloneNotSupportedException {
-        OfficeFloor officeFloor = (OfficeFloor)super.clone();
-        officeFloor.head = new NodeOfficeFloor();
+        OfficeFloor officeFloor = (OfficeFloor) super.clone();
+        officeFloor.head = new OfficeNode();
         for (int i = 0; i < this.getCount(); i++) {
-            officeFloor.setSpace(i, (Space)this.getSpace(i).clone());
+            officeFloor.setSpace(i, (Space) this.getSpace(i).clone());
         }
         return officeFloor;
     }

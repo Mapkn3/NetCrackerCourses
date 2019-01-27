@@ -1,110 +1,124 @@
 package buildings.dwelling;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import myInterface.*;
-import myException.*;
+import myException.SpaceIndexOutOfBoundsException;
+import myInterface.Floor;
+import myInterface.Space;
 import myIterator.FloorIterator;
 
+import java.io.Serializable;
+import java.util.Iterator;
+
 public class DwellingFloor implements Floor, Serializable, Cloneable {
-    protected Space[] floor;
-    
+    private Space[] flats;
+
     public DwellingFloor(int countFlats) {
-        this.floor = new Flat[countFlats];
-	for (int i = 0; i < countFlats; i++) {
-            this.floor[i] = new Flat();
-	}
+        this.flats = new Flat[countFlats];
+        for (int i = 0; i < flats.length; i++) {
+            this.flats[i] = new Flat();
+        }
     }
+
     public DwellingFloor(Space[] flats) {
-        this.floor = flats;
+        this.flats = flats;
     }
 
     @Override
     public int getCount() {
-	return this.floor.length;
+        return this.flats.length;
     }
+
     @Override
     public double getTotalSquare() {
-	double s = 0;
-        for (Space flat : floor) {
+        double s = 0;
+        for (Space flat : flats) {
             s += flat.getSquare();
         }
-	return s;
+        return s;
     }
+
     @Override
     public int getTotalRooms() {
-	int r = 0;
-        for (Space flat : floor) {
+        int r = 0;
+        for (Space flat : flats) {
             r += flat.getCountRooms();
         }
-	return r;
+        return r;
     }
+
     @Override
     public Space[] getSpaces() {
-	return this.floor;
+        return this.flats;
     }
+
     @Override
-    public Space getSpace(int index) {
-        if ((index < 0) || (index >= floor.length)) {
+    public Space getSpace(int index) throws SpaceIndexOutOfBoundsException {
+        if (!isCorrectFlatIndex(index)) {
             throw new SpaceIndexOutOfBoundsException();
         }
-        return this.floor[index];
+        return this.flats[index];
     }
+
     @Override
-    public void setSpace(int index, Space newSpace) {
-	if ((index < 0) || (index >= floor.length)) {
+    public void setSpace(int index, Space newSpace) throws SpaceIndexOutOfBoundsException {
+        if (!isCorrectFlatIndex(index)) {
             throw new SpaceIndexOutOfBoundsException();
-	}
-	this.floor[index] = newSpace;
+        }
+        this.flats[index] = newSpace;
     }
+
     @Override
-    public void addSpace(int index, Space newSpace) {
-	if ((index < 0) || (index >= floor.length)) {
+    public void addSpace(int index, Space newSpace) throws SpaceIndexOutOfBoundsException {
+        if (!isCorrectFlatIndex(index)) {
             throw new SpaceIndexOutOfBoundsException();
-	}
-	Space[] newFloor = new Flat[floor.length + 1];
-	for (int i = 0; i < index; i++) {
-            newFloor[i] = this.floor[i];
-	}
-	newFloor[index] = newSpace;
-	for (int i = index + 1; i < newFloor.length; i++)
-	{
-            newFloor[i] = this.floor[i - 1];
-	}
-	this.floor = newFloor;
+        }
+        Space[] newFlats = new Flat[flats.length + 1];
+        for (int i = 0; i < index; i++) {
+            newFlats[i] = this.flats[i];
+        }
+        newFlats[index] = newSpace;
+        for (int i = index + 1; i < newFlats.length; i++) {
+            newFlats[i] = this.flats[i - 1];
+        }
+        this.flats = newFlats;
     }
+
     @Override
-    public void deleteSpace(int index) {
-	if ((index < 0) || (index >= floor.length)) {
+    public void deleteSpace(int index) throws SpaceIndexOutOfBoundsException {
+        if (!isCorrectFlatIndex(index)) {
             throw new SpaceIndexOutOfBoundsException();
-	}
-	Space[] newFloor = new Flat[floor.length - 1];
-	for (int i = 0; i < index; i++) {
-            newFloor[i] = this.floor[i];
-	}
-	for (int i = index + 1; i < newFloor.length; i++) {
-            newFloor[i - 1] = this.floor[i];
-	}
-	this.floor = newFloor;
+        }
+        Space[] newFloor = new Flat[flats.length - 1];
+        for (int i = 0; i < index; i++) {
+            newFloor[i] = this.flats[i];
+        }
+        for (int i = index + 1; i < newFloor.length; i++) {
+            newFloor[i - 1] = this.flats[i];
+        }
+        this.flats = newFloor;
     }
+
     @Override
     public Space getBestSpace() {
-        int ibs = 0;
-	double bs = this.floor[ibs].getSquare();
-	for (int i = 1; i < floor.length; i++) {
-            if (this.floor[i].getSquare() > bs) {
-		ibs = i;
-		bs = this.floor[i].getSquare();
+        int indexOfBestSpace = 0;
+        double bestSpace = this.flats[indexOfBestSpace].getSquare();
+        for (int i = 1; i < this.flats.length; i++) {
+            if (this.flats[i].getSquare() > bestSpace) {
+                indexOfBestSpace = i;
+                bestSpace = this.flats[i].getSquare();
             }
-	}
-	return floor[ibs];
+        }
+        return flats[indexOfBestSpace];
+    }
+
+    private boolean isCorrectFlatIndex(int index) {
+        return (index >= 0) && (index < flats.length);
     }
 
     @Override
     public Iterator<Space> iterator() {
         return new FloorIterator(this);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder("DwellingFloor");
@@ -115,12 +129,12 @@ public class DwellingFloor implements Floor, Serializable, Cloneable {
         str.append(")");
         return str.toString();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         boolean isEquals = false;
         if (object.getClass() == DwellingFloor.class) {
-            DwellingFloor dwellingFloor = (DwellingFloor)object;
+            DwellingFloor dwellingFloor = (DwellingFloor) object;
             if (dwellingFloor.getCount() == this.getCount()) {
                 for (int i = 0; i < dwellingFloor.getCount(); i++) {
                     if (!dwellingFloor.getSpace(i).equals(this.getSpace(i))) {
@@ -141,13 +155,13 @@ public class DwellingFloor implements Floor, Serializable, Cloneable {
         }
         return hash;
     }
-    
+
     @Override
     public Object clone() throws CloneNotSupportedException {
-        DwellingFloor dwellingFloor = (DwellingFloor)super.clone();
-        dwellingFloor.floor = this.floor.clone();
+        DwellingFloor dwellingFloor = (DwellingFloor) super.clone();
+        dwellingFloor.flats = this.flats.clone();
         for (int i = 0; i < dwellingFloor.getCount(); i++) {
-            dwellingFloor.floor[i] = (Space)this.floor[i].clone();
+            dwellingFloor.flats[i] = (Space) this.flats[i].clone();
         }
         return dwellingFloor;
     }

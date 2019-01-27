@@ -1,162 +1,182 @@
 package buildings.dwelling;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import myInterface.*;
-import myException.*;
+import myException.FloorIndexOutOfBoundsException;
+import myException.SpaceIndexOutOfBoundsException;
+import myInterface.Building;
+import myInterface.Floor;
+import myInterface.Space;
 import myIterator.BuildingIterator;
 
+import java.io.Serializable;
+import java.util.Iterator;
+
 public class Dwelling implements Building, Serializable, Cloneable {
-    protected Floor[] floors;
-    
-    public Dwelling(int countFloors, int[] countFlats) {
-	this.floors = new DwellingFloor[countFloors];
-	for (int i = 0; i < countFloors; i++) {
-            this.floors[i] = new DwellingFloor(countFlats[i]);
-	}
+    private Floor[] floors;
+
+    public Dwelling(int countFloors, int[] countFlatsOnFloor) {
+        this.floors = new DwellingFloor[countFloors];
+        for (int i = 0; i < floors.length; i++) {
+            this.floors[i] = new DwellingFloor(countFlatsOnFloor[i]);
+        }
     }
+
     public Dwelling(Floor[] newFloors) {
-	this.floors = newFloors;
+        this.floors = newFloors;
     }
-    
+
     @Override
     public int getCountFloors() {
-	return this.floors.length;
+        return this.floors.length;
     }
+
     @Override
     public int getCountSpaces() {
-        int f = 0;
+        int countSpaces = 0;
         for (Floor floor : this.floors) {
-            f += floor.getCount();
+            countSpaces += floor.getCount();
         }
-	return f;
+        return countSpaces;
     }
+
     @Override
     public double getTotalSquare() {
-	double s = 0;
+        double totalSquare = 0;
         for (Floor floor : this.floors) {
-            s += floor.getTotalSquare();
+            totalSquare += floor.getTotalSquare();
         }
-	return s;
+        return totalSquare;
     }
+
     @Override
     public int getTotalRooms() {
-	int r = 0;
+        int totalRooms = 0;
         for (Floor floor : this.floors) {
-            r += floor.getTotalRooms();
+            totalRooms += floor.getTotalRooms();
         }
-	return r;
+        return totalRooms;
     }
+
     @Override
     public Floor[] getFloors() {
-	return this.floors;
+        return this.floors;
     }
+
     @Override
-    public Floor getFloor(int index) {
-        if ((index < 0) || (index >= floors.length)) {
+    public Floor getFloor(int index) throws FloorIndexOutOfBoundsException {
+        if (!isCorrectFloorIndex(index)) {
             throw new FloorIndexOutOfBoundsException();
-	}
-	return this.floors[index];
+        }
+        return this.floors[index];
     }
+
     @Override
-    public void setFloor(int index, Floor newFloor) {
-        if ((index < 0) || (index >= floors.length)) {
+    public void setFloor(int index, Floor newFloor) throws FloorIndexOutOfBoundsException {
+        if (!isCorrectFloorIndex(index)) {
             throw new FloorIndexOutOfBoundsException();
-	}
-	this.floors[index] = newFloor;
-    }
-    @Override
-    public Space getSpace(int index) {
-	if ((index < 0) || (index >= this.getCountSpaces())) {
-            throw new SpaceIndexOutOfBoundsException();
-	}
-	int i = 0;
-	while ((index > floors[i].getCount()) && (i < floors.length)) {
-            index -= floors[i].getCount();
-            i++;
-	}
-	return floors[i].getSpace(index);
-    }
-    @Override
-    public void setSpace(int index, Space newFlat) {
-	if ((index < 0) || (index >= this.getCountSpaces())) {
-            throw new SpaceIndexOutOfBoundsException();
-	}
-        for (Floor floor : floors) {
-            if (index >= floor.getCount()) {
-                index -= floor.getCount();
-            } else {
-                floor.setSpace(index, newFlat);
-            }
         }
+        this.floors[index] = newFloor;
     }
+
     @Override
-    public void addSpace(int index, Space newFlat) {
-	if ((index < 0) || (index >= this.getCountSpaces())) {
+    public Space getSpace(int index) throws SpaceIndexOutOfBoundsException {
+        if (!isCorrectFlatIndex(index)) {
             throw new SpaceIndexOutOfBoundsException();
-	}
-        for (Floor floor : floors) {
-            if ((index - floor.getCount()) > 0) {
-                index -= floor.getCount();
-            } else {
-                floor.addSpace(index, newFlat);
-            }
         }
+        return getFloorForFlatIndex(index).getSpace(recalculateFlatIndex(index));
     }
+
     @Override
-    public void deleteSpace(int index) {
-	if ((index < 0) || (index >= this.getCountSpaces())) {
+    public void setSpace(int index, Space newFlat) throws SpaceIndexOutOfBoundsException {
+        if (!isCorrectFlatIndex(index)) {
             throw new SpaceIndexOutOfBoundsException();
-	}
-        for (Floor floor : floors) {
-            if ((index - floor.getCount()) > 0) {
-                index -= floor.getCount();
-            } else {
-                floor.deleteSpace(index);
-            }
         }
+        getFloorForFlatIndex(index).setSpace(recalculateFlatIndex(index), newFlat);
     }
+
+    @Override
+    public void addSpace(int index, Space newFlat) throws SpaceIndexOutOfBoundsException {
+        if (!isCorrectFlatIndex(index)) {
+            throw new SpaceIndexOutOfBoundsException();
+        }
+        getFloorForFlatIndex(index).addSpace(recalculateFlatIndex(index), newFlat);
+    }
+
+    @Override
+    public void deleteSpace(int index) throws SpaceIndexOutOfBoundsException {
+        if (!isCorrectFlatIndex(index)) {
+            throw new SpaceIndexOutOfBoundsException();
+        }
+        getFloorForFlatIndex(index).deleteSpace(recalculateFlatIndex(index));
+    }
+
     @Override
     public Space getBestSpace() {
-	int indexBestFloor = 0;
-	Space bestSpace = floors[indexBestFloor].getBestSpace();
-	for (int i = 1; i < floors.length; i++) {
+        int indexBestFloor = 0;
+        Space bestSpace = floors[indexBestFloor].getBestSpace();
+        for (int i = 1; i < floors.length; i++) {
             if (floors[i].getBestSpace().getSquare() > bestSpace.getSquare()) {
-		indexBestFloor = i;
-		bestSpace = floors[indexBestFloor].getBestSpace();
+                indexBestFloor = i;
+                bestSpace = floors[indexBestFloor].getBestSpace();
             }
-	}
-	return bestSpace;
+        }
+        return bestSpace;
     }
+
     @Override
     public Space[] getSortedSpace() {
         int n = this.getCountSpaces();
-        Space[] flats = new Flat[n];
-	int k = 0;
+        Space[] flats = new Space[n];
+        int k = 0;
         for (Floor floor : floors) {
-            for (int j = 0; j < floor.getCount(); j++) {
-                flats[k] = floor.getSpace(j);
+            for (Space flat : floor.getSpaces()) {
+                flats[k] = flat;
                 k++;
             }
         }
-	Space t;
-	for (int i = 0; i < n - 1; i++) {
+        Space t;
+        for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n - i - 1; j++) {
-		if (flats[j].getSquare() < flats[j + 1].getSquare()) {
+                if (flats[j].getSquare() < flats[j + 1].getSquare()) {
                     t = flats[j];
                     flats[j] = flats[j + 1];
                     flats[j + 1] = t;
-		}
+                }
             }
-	}
-	return flats;
+        }
+        return flats;
+    }
+
+    private boolean isCorrectFlatIndex(int flatIndex) {
+        return (flatIndex >= 0) && (flatIndex < getCountSpaces());
+    }
+
+    private boolean isCorrectFloorIndex(int floorIndex) {
+        return (floorIndex >= 0) && (floorIndex < floors.length);
+    }
+
+    private int recalculateFlatIndex(int index) {
+        int i = 0;
+        while (index > floors[i].getCount()) {
+            index -= floors[i].getCount();
+            i++;
+        }
+        return index;
+    }
+
+    private Floor getFloorForFlatIndex(int index) {
+        int i = 0;
+        while (index > floors[i].getCount()) {
+            index -= floors[i].getCount();
+            i++;
+        }
+        return floors[i];
     }
 
     @Override
     public Iterator<Floor> iterator() {
         return new BuildingIterator(this);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder("Dwelling");
@@ -167,12 +187,12 @@ public class Dwelling implements Building, Serializable, Cloneable {
         str.append(")");
         return str.toString();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         boolean isEquals = false;
         if (object.getClass() == Dwelling.class) {
-            Dwelling dwelling = (Dwelling)object;
+            Dwelling dwelling = (Dwelling) object;
             if (dwelling.getCountFloors() == this.getCountFloors()) {
                 for (int i = 0; i < dwelling.getCountFloors(); i++) {
                     if (!dwelling.getFloor(i).equals(this.getFloor(i))) {
@@ -193,13 +213,13 @@ public class Dwelling implements Building, Serializable, Cloneable {
         }
         return hash;
     }
-    
+
     @Override
     public Object clone() throws CloneNotSupportedException {
-        Dwelling dwelling = (Dwelling)super.clone();
+        Dwelling dwelling = (Dwelling) super.clone();
         dwelling.floors = this.floors.clone();
         for (int i = 0; i < this.getCountFloors(); i++) {
-            dwelling.floors[i] = (Floor)this.floors[i].clone();
+            dwelling.floors[i] = (Floor) this.floors[i].clone();
         }
         return dwelling;
     }

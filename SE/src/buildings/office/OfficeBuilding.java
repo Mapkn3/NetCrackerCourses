@@ -1,29 +1,54 @@
 package buildings.office;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import myException.*;
-import myInterface.*;
+import myException.FloorIndexOutOfBoundsException;
+import myException.SpaceIndexOutOfBoundsException;
+import myInterface.Building;
+import myInterface.Floor;
+import myInterface.Space;
 import myIterator.BuildingIterator;
 
+import java.io.Serializable;
+import java.util.Iterator;
+
 public class OfficeBuilding implements Building, Serializable, Cloneable {
-    private NodeOfficeBuilding head;
-    
-    private NodeOfficeBuilding getNode(int index) {
+    private OfficeFloorNode head;
+
+    public OfficeBuilding(int count, int[] countOffices) {
+        try {
+            for (int i = 0; i < count; i++) {
+                this.addNode(i, new OfficeFloorNode(countOffices[i]));
+            }
+        } catch (SpaceIndexOutOfBoundsException | FloorIndexOutOfBoundsException e) {
+            throw e;
+        }
+    }
+
+    public OfficeBuilding(Floor[] floors) {
+        try {
+            for (int i = 0; i < floors.length; i++) {
+                this.addNode(i, new OfficeFloorNode(floors[i]));
+            }
+        } catch (FloorIndexOutOfBoundsException e) {
+            throw e;
+        }
+    }
+
+    private OfficeFloorNode getNode(int index) {
 	if (index < 0) {
             throw new FloorIndexOutOfBoundsException();
 	}
-	NodeOfficeBuilding temp = this.head;
+        OfficeFloorNode temp = this.head;
 	for (; index > 0; index--) {
             temp = temp.getNext();
 	}
 	return temp;
     }
-    private void addNode(int index, NodeOfficeBuilding building) {
+
+    private void addNode(int index, OfficeFloorNode building) {
         try {
             if (this.head != null) {
-                NodeOfficeBuilding next = this.getNode(index);
-		NodeOfficeBuilding prev = next.getPrev();
+                OfficeFloorNode next = this.getNode(index);
+                OfficeFloorNode prev = next.getPrev();
 		building.setPrev(next.getPrev());
 		building.setNext(prev.getNext());
 		prev.setNext(building);
@@ -41,11 +66,12 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
             throw e;
 	}
     }
+
     private void deleteNode(int index) {
 	try {
-            NodeOfficeBuilding del = this.getNode(index);
-            NodeOfficeBuilding prev = del.getPrev();
-            NodeOfficeBuilding next = del.getNext();
+        OfficeFloorNode del = this.getNode(index);
+        OfficeFloorNode prev = del.getPrev();
+        OfficeFloorNode next = del.getNext();
             if (index == 0) {
 		this.head = next;
             }
@@ -59,31 +85,10 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
 	}
     }
     
-    public OfficeBuilding(int count, int[] countOffices) {
-        try {
-            for (int i = 0; i < count; i++) {
-		this.addNode(i, new NodeOfficeBuilding(countOffices[i]));
-            }
-	}
-	catch (SpaceIndexOutOfBoundsException | FloorIndexOutOfBoundsException e) {
-            throw e;
-	}
-    }
-    public OfficeBuilding(Floor[] floors) {
-	try {
-            for (int i = 0; i < floors.length; i++) {
-		this.addNode(i, new NodeOfficeBuilding(floors[i]));
-            }
-	}
-	catch (FloorIndexOutOfBoundsException e) {
-            throw e;
-	}
-    }
-    
     @Override
     public int getCountFloors() {
         int count = 0;
-	NodeOfficeBuilding temp = this.head;
+        OfficeFloorNode temp = this.head;
 	do {
             count++;
             temp = temp.getNext();
@@ -93,7 +98,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public int getCountSpaces() {
 	int count = 0;
-	NodeOfficeBuilding temp = this.head;
+        OfficeFloorNode temp = this.head;
 	do {
             count += temp.getOfficeFloor().getCount();
             temp = temp.getNext();
@@ -103,7 +108,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public double getTotalSquare() {
 	double count = 0;
-	NodeOfficeBuilding temp = this.head;
+        OfficeFloorNode temp = this.head;
 	do {
             count += temp.getOfficeFloor().getTotalSquare();
             temp = temp.getNext();
@@ -113,7 +118,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public int getTotalRooms() {
 	int count = 0;
-	NodeOfficeBuilding temp = this.head;
+        OfficeFloorNode temp = this.head;
 	do {
             count += temp.getOfficeFloor().getTotalRooms();
             temp = temp.getNext();
@@ -124,7 +129,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     public Floor[] getFloors() {
 	int i = 0;
 	Floor[] floors = new OfficeFloor[this.getCountFloors()];
-	NodeOfficeBuilding node = this.head;
+        OfficeFloorNode node = this.head;
 	do {
             floors[i] = node.getOfficeFloor();
             i++;
@@ -134,7 +139,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     }
     @Override
     public Floor getFloor(int index) {
-	NodeOfficeBuilding node = this.head;
+        OfficeFloorNode node = this.head;
 	while (index > 1) {
             node = node.getNext();
             index--;
@@ -146,7 +151,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     }
     @Override
     public void setFloor(int index, Floor newFloor) {
-	NodeOfficeBuilding node = this.head;
+        OfficeFloorNode node = this.head;
 	while (index > 1) {
             node = node.getNext();
             index--;
@@ -159,7 +164,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public Space getSpace(int index) {
 	try {
-            NodeOfficeBuilding floor = this.head;
+        OfficeFloorNode floor = this.head;
             while (index > floor.getOfficeFloor().getCount()) {
 		index -= floor.getOfficeFloor().getCount();
 		floor = floor.getNext();
@@ -176,7 +181,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public void setSpace(int index, Space newOffice) {
 	try {
-            NodeOfficeBuilding floor = this.head;
+        OfficeFloorNode floor = this.head;
             while (index > floor.getOfficeFloor().getCount()) {
 		index -= floor.getOfficeFloor().getCount();
 		floor = floor.getNext();
@@ -193,7 +198,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public void addSpace(int index, Space newOffice) {
 	try {
-            NodeOfficeBuilding floor = this.head;
+        OfficeFloorNode floor = this.head;
             while (index > floor.getOfficeFloor().getCount()) {
                 index -= floor.getOfficeFloor().getCount();
 		floor = floor.getNext();
@@ -210,7 +215,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public void deleteSpace(int index) {
 	try {
-            NodeOfficeBuilding floor = this.head;
+        OfficeFloorNode floor = this.head;
             int i = 0;
             while (index > floor.getOfficeFloor().getCount()) {
 		index -= floor.getOfficeFloor().getCount();
@@ -251,7 +256,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public Space[] getSortedSpace() {
         int count = 0;
-	NodeOfficeBuilding temp = this.head;
+        OfficeFloorNode temp = this.head;
 	for (int i = 0; i < this.getCountFloors(); i++) {
             count += temp.getOfficeFloor().getCount();
             temp = temp.getNext();
@@ -325,7 +330,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     @Override
     public Object clone() throws CloneNotSupportedException {
         OfficeBuilding officeBuilding = (OfficeBuilding)super.clone();
-        officeBuilding.head = new NodeOfficeBuilding();
+        officeBuilding.head = new OfficeFloorNode();
         for (int i = 0; i < this.getCountFloors(); i++) {
             officeBuilding.setFloor(i, this.getFloor(i));
         }
