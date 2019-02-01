@@ -73,7 +73,7 @@ public class OfficeFloor implements Floor, Serializable, Cloneable {
 
     private void deleteNode(int index) throws SpaceIndexOutOfBoundsException {
         try {
-            OfficeNode del = this.getNode(index);
+            OfficeNode del = getNode(index);
             OfficeNode prev = del;
             while (prev.getNext() != del) {
                 prev = prev.getNext();
@@ -102,65 +102,57 @@ public class OfficeFloor implements Floor, Serializable, Cloneable {
     @Override
     public double getTotalSquare() {
         double square = 0;
-        OfficeNode temp = this.head;
-        do {
-            square += temp.getOffice().getSquare();
-            temp = temp.getNext();
-        } while (temp != this.head);
+        if (this.head != null) {
+            OfficeNode temp = this.head;
+            do {
+                square += temp.getOffice().getSquare();
+                temp = temp.getNext();
+            } while (temp != this.head);
+        }
         return square;
     }
 
     @Override
     public int getTotalRooms() {
         int rooms = 0;
-        OfficeNode temp = this.head;
-        do {
-            rooms += temp.getOffice().getCountRooms();
-            temp = temp.getNext();
-        } while (temp != this.head);
+        if (this.head != null) {
+            OfficeNode temp = this.head;
+            do {
+                rooms += temp.getOffice().getCountRooms();
+                temp = temp.getNext();
+            } while (temp != this.head);
+        }
         return rooms;
     }
 
     @Override
     public Space[] getSpaces() {
         Space[] offices = new Office[this.getCount()];
-        OfficeNode temp = this.head;
-        for (int i = 0; i < this.getCount(); i++) {
-            offices[i] = temp.getOffice();
-            temp = temp.getNext();
+        if (this.head != null) {
+            OfficeNode temp = this.head;
+            for (int i = 0; i < offices.length; i++) {
+                offices[i] = temp.getOffice();
+                temp = temp.getNext();
+            }
         }
         return offices;
     }
 
     @Override
     public Space getSpace(int index) {
-        OfficeNode temp = this.head;
-        for (; index > 0; index--) {
-            temp = temp.getNext();
-            if (temp == this.head) {
-                throw new SpaceIndexOutOfBoundsException();
-            }
-        }
-        return temp.getOffice();
+        return getNode(index).getOffice();
     }
 
     @Override
     public void setSpace(int index, Space newSpace) {
-        OfficeNode temp = this.head;
-        for (; index > 0; index--) {
-            temp = temp.getNext();
-            if (temp == this.head) {
-                throw new SpaceIndexOutOfBoundsException();
-            }
-        }
-        temp.setOffice(newSpace);
+        getNode(index).setOffice(newSpace);
     }
 
     @Override
     public void addSpace(int index, Space newSpace) {
         try {
-            this.addNode(index, new OfficeNode());
-            this.setSpace(index, newSpace);
+            addNode(index, new OfficeNode(newSpace));
+            setSpace(index, newSpace);
         } catch (SpaceIndexOutOfBoundsException e) {
             throw e;
         }
@@ -169,8 +161,7 @@ public class OfficeFloor implements Floor, Serializable, Cloneable {
     @Override
     public void deleteSpace(int index) {
         try {
-            this.setSpace(index, null);
-            this.deleteNode(index);
+            deleteNode(index);
         } catch (SpaceIndexOutOfBoundsException e) {
             throw e;
         }
@@ -178,12 +169,16 @@ public class OfficeFloor implements Floor, Serializable, Cloneable {
 
     @Override
     public Space getBestSpace() {
-        OfficeNode temp = this.head;
-        Space bestSpaceOffice = temp.getOffice();
-        for (int i = 0; i < this.getCount(); i++) {
-            temp = temp.getNext();
-            if (temp.getOffice().getSquare() > bestSpaceOffice.getSquare()) {
-                bestSpaceOffice = temp.getOffice();
+        Space bestSpaceOffice = null;
+        if (this.head != null) {
+            OfficeNode temp = this.head;
+            int countOffices = this.getCount();
+            bestSpaceOffice = temp.getOffice();
+            for (int i = 0; i < countOffices; i++) {
+                temp = temp.getNext();
+                if (temp.getOffice().getSquare() > bestSpaceOffice.getSquare()) {
+                    bestSpaceOffice = temp.getOffice();
+                }
             }
         }
         return bestSpaceOffice;
