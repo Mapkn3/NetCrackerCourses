@@ -47,22 +47,22 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
         return temp;
     }
 
-    private void addNode(int index, OfficeFloorNode building) throws FloorIndexOutOfBoundsException {
+    private void addNode(int index, OfficeFloorNode floor) throws FloorIndexOutOfBoundsException {
         try {
             if (this.head != null) {
                 OfficeFloorNode next = getNode(index);
                 OfficeFloorNode prev = next.getPrev();
-                building.setPrev(next.getPrev());
-                building.setNext(prev.getNext());
-                prev.setNext(building);
-                next.setPrev(building);
+                floor.setPrev(prev);
+                floor.setNext(next);
+                prev.setNext(floor);
+                next.setPrev(floor);
                 if (index == 0) {
-                    this.head = building;
+                    this.head = floor;
                 }
             } else {
-                building.setPrev(building);
-                building.setNext(building);
-                this.head = building;
+                floor.setPrev(floor);
+                floor.setNext(floor);
+                this.head = floor;
             }
         } catch (FloorIndexOutOfBoundsException e) {
             throw e;
@@ -71,16 +71,16 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
 
     private void deleteNode(int index) throws FloorIndexOutOfBoundsException {
         try {
-            OfficeFloorNode del = this.getNode(index);
+            OfficeFloorNode del = getNode(index);
             OfficeFloorNode prev = del.getPrev();
             OfficeFloorNode next = del.getNext();
+            prev.setNext(next);
+            next.setPrev(prev);
+            del.setPrev(null);
+            del.setNext(null);
             if (index == 0) {
                 this.head = next;
             }
-            prev.setNext(del.getNext());
-            next.setPrev(del.getPrev());
-            del.setPrev(null);
-            del.setNext(null);
         } catch (FloorIndexOutOfBoundsException e) {
             throw e;
         }
@@ -143,94 +143,107 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
         Floor[] floors = new OfficeFloor[this.getCountFloors()];
         if (this.head != null) {
             OfficeFloorNode node = this.head;
-            for (int i = 0; i < floors.length; i++, node.getNext()) {
+            for (int i = 0; i < floors.length; i++) {
                 floors[i] = node.getOfficeFloor();
+                node = node.getNext();
             }
         }
         return floors;
     }
 
     @Override
-    public Floor getFloor(int index) {
-        return getNode(index).getOfficeFloor();
-    }
-
-    @Override
-    public void setFloor(int index, Floor newFloor) {
-        getNode(index).setOfficeFloor(newFloor);
-    }
-
-    @Override
-    public Space getSpace(int index) {
-        try {
-            OfficeFloorNode floor = this.head;
-            while (index > floor.getOfficeFloor().getCount()) {
-                index -= floor.getOfficeFloor().getCount();
-                floor = floor.getNext();
-                if (floor == this.head) {
-                    throw new FloorIndexOutOfBoundsException();
-                }
-            }
-            return floor.getOfficeFloor().getSpace(index);
-        } catch (SpaceIndexOutOfBoundsException e) {
-            throw e;
+    public Floor getFloor(int index) throws FloorIndexOutOfBoundsException {
+        if (isCorrectFloorIndex(index)) {
+            return getNode(index).getOfficeFloor();
+        } else {
+            throw new FloorIndexOutOfBoundsException();
         }
     }
 
     @Override
-    public void setSpace(int index, Space newOffice) {
-        try {
-            OfficeFloorNode floor = this.head;
-            while (index > floor.getOfficeFloor().getCount()) {
-                index -= floor.getOfficeFloor().getCount();
-                floor = floor.getNext();
-                if (floor == this.head) {
-                    throw new FloorIndexOutOfBoundsException();
-                }
-            }
-            floor.getOfficeFloor().setSpace(index, newOffice);
-        } catch (SpaceIndexOutOfBoundsException e) {
-            throw e;
+    public void setFloor(int index, Floor newFloor) throws FloorIndexOutOfBoundsException {
+        if (isCorrectFloorIndex(index)) {
+            getNode(index).setOfficeFloor(newFloor);
+        } else {
+            throw new FloorIndexOutOfBoundsException();
         }
     }
 
     @Override
-    public void addSpace(int index, Space newOffice) {
-        try {
-            OfficeFloorNode floor = this.head;
-            while (index > floor.getOfficeFloor().getCount()) {
-                index -= floor.getOfficeFloor().getCount();
-                floor = floor.getNext();
-                if (floor == this.head) {
-                    throw new FloorIndexOutOfBoundsException();
-                }
-            }
-            floor.getOfficeFloor().addSpace(index, newOffice);
-        } catch (SpaceIndexOutOfBoundsException e) {
-            throw e;
+    public Space getSpace(int index) throws SpaceIndexOutOfBoundsException {
+        if (isCorrectOfficeIndex(index)) {
+            return getNode(getFloorIndexForOfficeIndex(index)).getOfficeFloor().getSpace(getLocalOfficeIndexOnFloor(index));
+        } else {
+            throw new SpaceIndexOutOfBoundsException();
+        }
+    }
+
+    @Override
+    public void setSpace(int index, Space newOffice) throws SpaceIndexOutOfBoundsException {
+        if (isCorrectOfficeIndex(index)) {
+            getNode(getFloorIndexForOfficeIndex(index)).getOfficeFloor().setSpace(getLocalOfficeIndexOnFloor(index), newOffice);
+        } else {
+            throw new SpaceIndexOutOfBoundsException();
+        }
+    }
+
+    @Override
+    public void addSpace(int index, Space newOffice) throws SpaceIndexOutOfBoundsException {
+        if (isCorrectOfficeIndex(index)) {
+            getNode(getFloorIndexForOfficeIndex(index)).getOfficeFloor().addSpace(getLocalOfficeIndexOnFloor(index), newOffice);
+        } else {
+            throw new SpaceIndexOutOfBoundsException();
         }
     }
 
     @Override
     public void deleteSpace(int index) {
-        try {
+        if (isCorrectOfficeIndex(index)) {
+            getNode(getFloorIndexForOfficeIndex(index)).getOfficeFloor().deleteSpace(getLocalOfficeIndexOnFloor(index));
+            if (getNode(getFloorIndexForOfficeIndex(index)).getOfficeFloor().getCount() == 0) {
+                deleteNode(getFloorIndexForOfficeIndex(index));
+            }
+        } else {
+            throw new SpaceIndexOutOfBoundsException();
+        }
+    }
+
+    private boolean isCorrectOfficeIndex(int officeIndex) {
+        return (officeIndex >= 0) && (officeIndex < getCountSpaces());
+    }
+
+    private boolean isCorrectFloorIndex(int floorIndex) {
+        return (floorIndex >= 0) && (floorIndex < getCountFloors());
+    }
+
+    private int getLocalOfficeIndexOnFloor(int index) throws SpaceIndexOutOfBoundsException, FloorIndexOutOfBoundsException {
+        if (isCorrectOfficeIndex(index)) {
             OfficeFloorNode floor = this.head;
-            int i = 0;
             while (index > floor.getOfficeFloor().getCount()) {
                 index -= floor.getOfficeFloor().getCount();
                 floor = floor.getNext();
                 if (floor == this.head) {
                     throw new FloorIndexOutOfBoundsException();
                 }
-                i++;
             }
-            floor.getOfficeFloor().deleteSpace(index);
-            if (floor.getOfficeFloor().getCount() == 0) {
-                this.deleteNode(i);
-            }
-        } catch (SpaceIndexOutOfBoundsException | FloorIndexOutOfBoundsException e) {
-            throw e;
+            return index;
+        } else {
+            throw new SpaceIndexOutOfBoundsException();
         }
+    }
+
+    private int getFloorIndexForOfficeIndex(int index) throws FloorIndexOutOfBoundsException {
+        int floorIndex = 0;
+        OfficeFloorNode floor = this.head;
+        while (index > floor.getOfficeFloor().getCount()) {
+            index -= floor.getOfficeFloor().getCount();
+            floor = floor.getNext();
+            if (floor == this.head) {
+                throw new FloorIndexOutOfBoundsException();
+            }
+            floorIndex++;
+        }
+        return floorIndex;
     }
 
     @Override

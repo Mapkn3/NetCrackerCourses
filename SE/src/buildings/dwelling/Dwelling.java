@@ -63,50 +63,95 @@ public class Dwelling implements Building, Serializable, Cloneable {
 
     @Override
     public Floor getFloor(int index) throws FloorIndexOutOfBoundsException {
-        if (!isCorrectFloorIndex(index)) {
+        if (isCorrectFloorIndex(index)) {
+            return this.floors[index];
+        } else {
             throw new FloorIndexOutOfBoundsException();
         }
-        return this.floors[index];
+
     }
 
     @Override
     public void setFloor(int index, Floor newFloor) throws FloorIndexOutOfBoundsException {
-        if (!isCorrectFloorIndex(index)) {
+        if (isCorrectFloorIndex(index)) {
+            this.floors[index] = newFloor;
+        } else {
             throw new FloorIndexOutOfBoundsException();
         }
-        this.floors[index] = newFloor;
     }
 
     @Override
     public Space getSpace(int index) throws SpaceIndexOutOfBoundsException {
-        if (!isCorrectFlatIndex(index)) {
+        if (isCorrectFlatIndex(index)) {
+            return getFloor(getFloorIndexForFlatIndex(index)).getSpace(getLocalFlatIndexOnFloor(index));
+        } else {
             throw new SpaceIndexOutOfBoundsException();
         }
-        return getFloorForFlatIndex(index).getSpace(recalculateFlatIndex(index));
     }
 
     @Override
     public void setSpace(int index, Space newFlat) throws SpaceIndexOutOfBoundsException {
-        if (!isCorrectFlatIndex(index)) {
+        if (isCorrectFlatIndex(index)) {
+            getFloor(getFloorIndexForFlatIndex(index)).setSpace(getLocalFlatIndexOnFloor(index), newFlat);
+        } else {
             throw new SpaceIndexOutOfBoundsException();
         }
-        getFloorForFlatIndex(index).setSpace(recalculateFlatIndex(index), newFlat);
     }
 
     @Override
     public void addSpace(int index, Space newFlat) throws SpaceIndexOutOfBoundsException {
-        if (!isCorrectFlatIndex(index)) {
+        if (isCorrectFlatIndex(index)) {
+            getFloor(getFloorIndexForFlatIndex(index)).addSpace(getLocalFlatIndexOnFloor(index), newFlat);
+        } else {
             throw new SpaceIndexOutOfBoundsException();
         }
-        getFloorForFlatIndex(index).addSpace(recalculateFlatIndex(index), newFlat);
     }
 
     @Override
     public void deleteSpace(int index) throws SpaceIndexOutOfBoundsException {
-        if (!isCorrectFlatIndex(index)) {
+        if (isCorrectFlatIndex(index)) {
+            getFloor(getFloorIndexForFlatIndex(index)).deleteSpace(getLocalFlatIndexOnFloor(index));
+        } else {
             throw new SpaceIndexOutOfBoundsException();
         }
-        getFloorForFlatIndex(index).deleteSpace(recalculateFlatIndex(index));
+    }
+
+    private boolean isCorrectFlatIndex(int flatIndex) {
+        return (flatIndex >= 0) && (flatIndex < getCountSpaces());
+    }
+
+    private boolean isCorrectFloorIndex(int floorIndex) {
+        return (floorIndex >= 0) && (floorIndex < floors.length);
+    }
+
+    private int getLocalFlatIndexOnFloor(int index) throws SpaceIndexOutOfBoundsException, FloorIndexOutOfBoundsException {
+        if (isCorrectFlatIndex(index)) {
+            int i = 0;
+            while (index > floors[i].getCount()) {
+                index -= floors[i].getCount();
+                i++;
+                if (i == floors.length) {
+                    throw new FloorIndexOutOfBoundsException();
+                }
+            }
+            return index;
+        } else {
+            throw new SpaceIndexOutOfBoundsException();
+        }
+    }
+
+    private int getFloorIndexForFlatIndex(int index) throws FloorIndexOutOfBoundsException {
+        int floorIndex = 0;
+        int i = 0;
+        while (index > floors[i].getCount()) {
+            index -= floors[i].getCount();
+            i++;
+            if (i == floors.length) {
+                throw new FloorIndexOutOfBoundsException();
+            }
+            floorIndex++;
+        }
+        return floorIndex;
     }
 
     @Override
@@ -144,32 +189,6 @@ public class Dwelling implements Building, Serializable, Cloneable {
             }
         }
         return flats;
-    }
-
-    private boolean isCorrectFlatIndex(int flatIndex) {
-        return (flatIndex >= 0) && (flatIndex < getCountSpaces());
-    }
-
-    private boolean isCorrectFloorIndex(int floorIndex) {
-        return (floorIndex >= 0) && (floorIndex < floors.length);
-    }
-
-    private int recalculateFlatIndex(int index) {
-        int i = 0;
-        while (index > floors[i].getCount()) {
-            index -= floors[i].getCount();
-            i++;
-        }
-        return index;
-    }
-
-    private Floor getFloorForFlatIndex(int index) {
-        int i = 0;
-        while (index > floors[i].getCount()) {
-            index -= floors[i].getCount();
-            i++;
-        }
-        return floors[i];
     }
 
     @Override

@@ -45,18 +45,18 @@ public class OfficeFloor implements Floor, Serializable, Cloneable {
         return temp;
     }
 
+    private OfficeNode getPrevForIndex(int index) {
+        int prevIndex = index - 1;
+        if (prevIndex < 0) {
+            prevIndex += getCount();
+        }
+        return getNode(prevIndex);
+    }
+
     private void addNode(int index, OfficeNode floor) throws SpaceIndexOutOfBoundsException {
         try {
             if (this.head != null) {
-                OfficeNode prev;
-                if (index == 0) {
-                    prev = this.head;
-                    while (prev.getNext() != this.head) {
-                        prev = prev.getNext();
-                    }
-                } else {
-                    prev = this.getNode(index - 1);
-                }
+                OfficeNode prev = getPrevForIndex(index);
                 floor.setNext(prev.getNext());
                 prev.setNext(floor);
                 if (index == 0) {
@@ -74,10 +74,7 @@ public class OfficeFloor implements Floor, Serializable, Cloneable {
     private void deleteNode(int index) throws SpaceIndexOutOfBoundsException {
         try {
             OfficeNode del = getNode(index);
-            OfficeNode prev = del;
-            while (prev.getNext() != del) {
-                prev = prev.getNext();
-            }
+            OfficeNode prev = getPrevForIndex(index);
             prev.setNext(del.getNext());
             del.setNext(null);
             del.setOffice(null);

@@ -1,5 +1,7 @@
 package myInterface;
 
+import java.util.Iterator;
+
 public interface Floor {
     int getCount();
 
@@ -19,7 +21,7 @@ public interface Floor {
 
     Space getBestSpace();
 
-    java.util.Iterator iterator();
+    Iterator iterator();
 
     Object clone() throws CloneNotSupportedException;
 }
