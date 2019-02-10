@@ -161,7 +161,7 @@ public class DwellingFloor implements Floor, Serializable, Cloneable {
         DwellingFloor dwellingFloor = (DwellingFloor) super.clone();
         dwellingFloor.flats = this.flats.clone();
         for (int i = 0; i < dwellingFloor.getCount(); i++) {
-            dwellingFloor.flats[i] = (Space) this.flats[i].clone();
+            dwellingFloor.setSpace(i, (Space) this.getSpace(i).clone());
         }
         return dwellingFloor;
     }

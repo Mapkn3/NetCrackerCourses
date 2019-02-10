@@ -1,12 +1,19 @@
 package myFactory;
 
-import myInterface.*;
+import myInterface.Building;
+import myInterface.Floor;
+import myInterface.Space;
 
 public interface BuildingFactory {
-    public Space createSpace(double area);
-    public Space createSpace(int roomsCount, double area);
-    public Floor createFloor(int spacesCount);
-    public Floor createFloor(Space[] spaces);
-    public Building createBuilding(int floorsCount, int[] spacesCounts);
-    public Building createBuilding(Floor[] floors);
+    Space createSpace(double area);
+
+    Space createSpace(int roomsCount, double area);
+
+    Floor createFloor(int spacesCount);
+
+    Floor createFloor(Space[] spaces);
+
+    Building createBuilding(int floorsCount, int[] spacesCounts);
+
+    Building createBuilding(Floor[] floors);
 }

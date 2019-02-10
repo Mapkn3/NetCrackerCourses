@@ -1,13 +1,11 @@
 package myException;
 
-public class InexchangeableFloorsException extends Exception{
-    String message = "Несоответствие обменивающихся этажей";
-    
+public class InexchangeableFloorsException extends Exception {
     public InexchangeableFloorsException() {
-        super();
+        this("Несоответствие обменивающихся этажей");
     }
-    public InexchangeableFloorsException(String mes) {
-        super(mes);
-        this.message = mes;
+
+    public InexchangeableFloorsException(String message) {
+        super(message);
     }
 }

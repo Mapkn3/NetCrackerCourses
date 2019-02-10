@@ -4,29 +4,30 @@ import buildings.dwelling.DwellingFloor;
 import myInterface.Space;
 
 public class HotelFloor extends DwellingFloor implements Cloneable {
-    
-    public static final int DEFAULT_COUNT_STARS = 3;
+
+    public static final int DEFAULT_COUNT_STARS = 1;
     private int countStars;
-    
+
     public HotelFloor(int countFlats) {
         super(countFlats);
         this.countStars = HotelFloor.DEFAULT_COUNT_STARS;
     }
+
     public HotelFloor(Space[] flats) {
         super(flats);
         this.countStars = HotelFloor.DEFAULT_COUNT_STARS;
     }
-    
+
     public int getStars() {
         return this.countStars;
     }
-    
+
     public void setStars(int countStars) {
         if (countStars >= 1 && countStars <= 5) {
             this.countStars = countStars;
         }
     }
-    
+
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder("HotelFloor");
@@ -37,12 +38,12 @@ public class HotelFloor extends DwellingFloor implements Cloneable {
         str.append(")");
         return str.toString();
     }
-    
+
     @Override
     public boolean equals(Object object) {
         boolean isEquals = false;
         if (object.getClass() == HotelFloor.class) {
-            HotelFloor hotelFloor = (HotelFloor)object;
+            HotelFloor hotelFloor = (HotelFloor) object;
             if (hotelFloor.getCount() == this.getCount() && hotelFloor.getStars() == this.getStars()) {
                 for (int i = 0; i < hotelFloor.getCount(); i++) {
                     if (!hotelFloor.getSpace(i).equals(this.getSpace(i))) {
@@ -63,13 +64,13 @@ public class HotelFloor extends DwellingFloor implements Cloneable {
         }
         return hash;
     }
-    
+
     @Override
     public Object clone() throws CloneNotSupportedException {
-        HotelFloor hotelFloor = (HotelFloor)super.clone();
-        hotelFloor.floor = this.floor.clone();
-        for (int i = 0; i < hotelFloor.getCount(); i++) {
-            hotelFloor.floor[i] = (Space)this.floor[i].clone();
+        HotelFloor hotelFloor = (HotelFloor) super.clone();
+        hotelFloor.setStars(this.getStars());
+        for (int i = 0; i < this.getCount(); i++) {
+            hotelFloor.setSpace(i, (Space) this.getSpace(i).clone());
         }
         return hotelFloor;
     }

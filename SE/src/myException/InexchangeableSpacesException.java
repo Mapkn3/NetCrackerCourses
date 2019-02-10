@@ -1,13 +1,11 @@
 package myException;
 
-public class InexchangeableSpacesException extends Exception{
-    String message = "Несоответствие обменивающихся помещений";
-    
+public class InexchangeableSpacesException extends Exception {
     public InexchangeableSpacesException() {
-        super();
+        this("Несоответствие обменивающихся помещений");
     }
-    public InexchangeableSpacesException(String mes) {
-        super(mes);
-        this.message = mes;
+
+    public InexchangeableSpacesException(String message) {
+        super(message);
     }
 }

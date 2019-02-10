@@ -1,12 +1,11 @@
 package myException;
 
 public class InvalidSpaceAreaException extends IllegalArgumentException {
-    String message = "Некорректная площадь помещения";
     public InvalidSpaceAreaException() {
-	super();
+        this("Некорректная площадь помещения");
     }
-    public InvalidSpaceAreaException(String mes) {
-	super(mes);
-	this.message = mes;
+
+    public InvalidSpaceAreaException(String message) {
+        super(message);
     }
 }

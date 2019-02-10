@@ -1,7 +1,11 @@
 package myFactory;
 
-import buildings.office.*;
-import myInterface.*;
+import buildings.office.Office;
+import buildings.office.OfficeBuilding;
+import buildings.office.OfficeFloor;
+import myInterface.Building;
+import myInterface.Floor;
+import myInterface.Space;
 
 public class OfficeFactory implements BuildingFactory {
 

@@ -15,8 +15,8 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
 
     public OfficeBuilding(int count, int[] countOffices) throws SpaceIndexOutOfBoundsException, FloorIndexOutOfBoundsException {
         try {
-            for (int i = 0; i < count; i++) {
-                this.addNode(i, new OfficeFloorNode(countOffices[i]));
+            for (int i = count - 1; i >= 0; i--) {
+                this.addNode(0, new OfficeFloorNode(countOffices[i]));
             }
         } catch (SpaceIndexOutOfBoundsException | FloorIndexOutOfBoundsException e) {
             throw e;
@@ -25,8 +25,8 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
 
     public OfficeBuilding(Floor[] floors) throws FloorIndexOutOfBoundsException {
         try {
-            for (int i = 0; i < floors.length; i++) {
-                this.addNode(i, new OfficeFloorNode(floors[i]));
+            for (int i = floors.length - 1; i >= 0; i--) {
+                this.addNode(0, new OfficeFloorNode(floors[i]));
             }
         } catch (FloorIndexOutOfBoundsException e) {
             throw e;
@@ -48,24 +48,28 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     }
 
     private void addNode(int index, OfficeFloorNode floor) throws FloorIndexOutOfBoundsException {
-        try {
-            if (this.head != null) {
-                OfficeFloorNode next = getNode(index);
-                OfficeFloorNode prev = next.getPrev();
-                floor.setPrev(prev);
-                floor.setNext(next);
-                prev.setNext(floor);
-                next.setPrev(floor);
-                if (index == 0) {
+        if (isCorrectFloorIndex(index)) {
+            try {
+                if (this.head != null) {
+                    OfficeFloorNode next = getNode(index);
+                    OfficeFloorNode prev = next.getPrev();
+                    floor.setPrev(prev);
+                    floor.setNext(next);
+                    prev.setNext(floor);
+                    next.setPrev(floor);
+                    if (index == 0) {
+                        this.head = floor;
+                    }
+                } else {
+                    floor.setPrev(floor);
+                    floor.setNext(floor);
                     this.head = floor;
                 }
-            } else {
-                floor.setPrev(floor);
-                floor.setNext(floor);
-                this.head = floor;
+            } catch (FloorIndexOutOfBoundsException e) {
+                throw e;
             }
-        } catch (FloorIndexOutOfBoundsException e) {
-            throw e;
+        } else {
+            throw new FloorIndexOutOfBoundsException();
         }
     }
 
@@ -213,13 +217,13 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     }
 
     private boolean isCorrectFloorIndex(int floorIndex) {
-        return (floorIndex >= 0) && (floorIndex < getCountFloors());
+        return (floorIndex == 0) || ((floorIndex > 0) && (floorIndex < getCountFloors()));
     }
 
     private int getLocalOfficeIndexOnFloor(int index) throws SpaceIndexOutOfBoundsException, FloorIndexOutOfBoundsException {
         if (isCorrectOfficeIndex(index)) {
             OfficeFloorNode floor = this.head;
-            while (index > floor.getOfficeFloor().getCount()) {
+            while (index >= floor.getOfficeFloor().getCount()) {
                 index -= floor.getOfficeFloor().getCount();
                 floor = floor.getNext();
                 if (floor == this.head) {
@@ -235,7 +239,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
     private int getFloorIndexForOfficeIndex(int index) throws FloorIndexOutOfBoundsException {
         int floorIndex = 0;
         OfficeFloorNode floor = this.head;
-        while (index > floor.getOfficeFloor().getCount()) {
+        while (index >= floor.getOfficeFloor().getCount()) {
             index -= floor.getOfficeFloor().getCount();
             floor = floor.getNext();
             if (floor == this.head) {
@@ -344,7 +348,7 @@ public class OfficeBuilding implements Building, Serializable, Cloneable {
         OfficeBuilding officeBuilding = (OfficeBuilding) super.clone();
         officeBuilding.head = new OfficeFloorNode();
         for (int i = 0; i < this.getCountFloors(); i++) {
-            officeBuilding.setFloor(i, this.getFloor(i));
+            officeBuilding.setFloor(i, (Floor) this.getFloor(i).clone());
         }
         return officeBuilding;
     }

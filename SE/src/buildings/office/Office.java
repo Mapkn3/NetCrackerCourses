@@ -79,11 +79,15 @@ public class Office implements Space, Serializable, Cloneable {
 
     @Override
     public int hashCode() {
-        return this.countRooms ^ (int) (Double.doubleToLongBits(this.square) ^ (Double.doubleToLongBits(this.square) >>> 32));
+        long square = Double.doubleToLongBits(this.square);
+        return this.countRooms ^ (int) (square ^ (square >>> 32));
     }
 
     @Override
     public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+        Office office = (Office) super.clone();
+        office.setSquare(this.square);
+        office.setCountRooms(this.countRooms);
+        return office;
     }
 }

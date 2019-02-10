@@ -1,8 +1,11 @@
 package myFactory;
 
 import buildings.dwelling.Flat;
-import buildings.dwelling.hotel.*;
-import myInterface.*;
+import buildings.dwelling.hotel.Hotel;
+import buildings.dwelling.hotel.HotelFloor;
+import myInterface.Building;
+import myInterface.Floor;
+import myInterface.Space;
 
 public class HotelFactory implements BuildingFactory {
 

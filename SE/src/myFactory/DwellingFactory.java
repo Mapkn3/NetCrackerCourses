@@ -1,7 +1,11 @@
 package myFactory;
 
-import buildings.dwelling.*;
-import myInterface.*;
+import buildings.dwelling.Dwelling;
+import buildings.dwelling.DwellingFloor;
+import buildings.dwelling.Flat;
+import myInterface.Building;
+import myInterface.Floor;
+import myInterface.Space;
 
 public class DwellingFactory implements BuildingFactory {
 

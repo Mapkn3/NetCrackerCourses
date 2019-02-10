@@ -127,7 +127,7 @@ public class Dwelling implements Building, Serializable, Cloneable {
     private int getLocalFlatIndexOnFloor(int index) throws SpaceIndexOutOfBoundsException, FloorIndexOutOfBoundsException {
         if (isCorrectFlatIndex(index)) {
             int i = 0;
-            while (index > floors[i].getCount()) {
+            while (index >= floors[i].getCount()) {
                 index -= floors[i].getCount();
                 i++;
                 if (i == floors.length) {
@@ -143,7 +143,7 @@ public class Dwelling implements Building, Serializable, Cloneable {
     private int getFloorIndexForFlatIndex(int index) throws FloorIndexOutOfBoundsException {
         int floorIndex = 0;
         int i = 0;
-        while (index > floors[i].getCount()) {
+        while (index >= floors[i].getCount()) {
             index -= floors[i].getCount();
             i++;
             if (i == floors.length) {
@@ -238,7 +238,7 @@ public class Dwelling implements Building, Serializable, Cloneable {
         Dwelling dwelling = (Dwelling) super.clone();
         dwelling.floors = this.floors.clone();
         for (int i = 0; i < this.getCountFloors(); i++) {
-            dwelling.floors[i] = (Floor) this.floors[i].clone();
+            dwelling.setFloor(i, (Floor) this.getFloor(i).clone());
         }
         return dwelling;
     }

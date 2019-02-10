@@ -1,13 +1,11 @@
 package myException;
 
 public class FloorIndexOutOfBoundsException extends IndexOutOfBoundsException {
-    String message = "Выход за границы номеров этажей";
-    
     public FloorIndexOutOfBoundsException() {
-	super();
+        this("Выход за границы номеров этажей");
     }
-    public FloorIndexOutOfBoundsException(String mes) {
-	super(mes);
-	this.message = mes;
+
+    public FloorIndexOutOfBoundsException(String message) {
+        super(message);
     }
 }

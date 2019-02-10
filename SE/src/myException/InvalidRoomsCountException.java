@@ -1,12 +1,11 @@
 package myException;
 
 public class InvalidRoomsCountException extends IllegalArgumentException {
-    String message = "Некорректное количество комнат в помещении";
     public InvalidRoomsCountException() {
-	super();
+        this("Некорректное количество комнат в помещении");
     }
-    public InvalidRoomsCountException(String mes) {
-	super(mes);
-	this.message = mes;
+
+    public InvalidRoomsCountException(String message) {
+        super(message);
     }
 }

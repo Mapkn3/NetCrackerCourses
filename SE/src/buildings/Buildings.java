@@ -1,17 +1,21 @@
 package buildings;
 
-import java.io.*;
-import static java.lang.String.format;
-import myFactory.*;
+import myFactory.BuildingFactory;
+import myFactory.DwellingFactory;
 import myInterface.*;
+
+import java.io.*;
+import java.util.StringTokenizer;
+
+import static java.lang.String.format;
 
 public class Buildings {
     public static BuildingFactory factory = new DwellingFactory();
-    
+
     public static void setBuildingFactory(BuildingFactory factory) {
         Buildings.factory = factory;
     }
-    
+
     public static Space createSpace(double area) {
         return Buildings.factory.createSpace(area);
     }
@@ -35,61 +39,54 @@ public class Buildings {
     public static Building createBuilding(Floor[] floors) {
         return Buildings.factory.createBuilding(floors);
     }
-    
-    public static Floor synchronizedFloor (Floor floor) {
+
+    public static Floor synchronizedFloor(Floor floor) {
         return new SynchronizedFloor(floor);
     }
-    
-    public static void outputBuilding (Building building, OutputStream out) throws IOException {
-        StringBuilder obj = new StringBuilder();
-        obj.append(building.getCountFloors());
+
+    private static String convertBuildingToString(Building building) {
+        StringBuilder buildingString = new StringBuilder();
+        buildingString.append(building.getCountFloors());
         for (Floor floor : building.getFloors()) {
-            obj.append(" ").append(floor.getCount());
+            buildingString.append(" ").append(floor.getCount());
             for (Space space : floor.getSpaces()) {
-                obj.append(" ").append(space.getCountRooms()).append(" ").append(format("%.1f", space.getSquare()));
+                buildingString.append(" ").append(space.getCountRooms()).append(" ").append(format("%.1f", space.getSquare()));
             }
         }
-        out.write((obj.toString().replace(',', '.') + "\n").getBytes());
+        return buildingString.toString().replace(',', '.');
+    }
+
+    public static void outputBuilding(Building building, OutputStream out) throws IOException {
+        out.write(convertBuildingToString(building).getBytes());
         out.flush();
     }
 
-    public static Building inputBuilding (InputStream in) throws IOException {
+    public static Building inputBuilding(InputStream in) throws IOException {
         StringBuilder temp = new StringBuilder();
         int n;
         while ((n = in.read()) != -1) {
             temp.append((char) n);
         }
-        String[] obj = temp.toString().replace(',', '.').split(" ");
-        int k = 0;
-        Floor[] floors = new Floor[Integer.parseInt(obj[k])];
-        k++;
+        StringTokenizer stringTokenizer = new StringTokenizer(temp.toString());
+        Floor[] floors = new Floor[Integer.parseInt(stringTokenizer.nextToken())];
         for (int i = 0; i < floors.length; i++) {
-            Space[] spaces = new Space[Integer.parseInt(obj[k])];
-            k++;
+            Space[] spaces = new Space[Integer.parseInt(stringTokenizer.nextToken())];
             for (int j = 0; j < spaces.length; j++) {
-                int rooms = Integer.parseInt(obj[k]);
-                k++;
-                double square = Double.parseDouble(obj[k]);
-                k++;
-                spaces[j] = Buildings.createSpace(rooms, square);
+                int countRooms = Integer.parseInt(stringTokenizer.nextToken());
+                double square = Double.parseDouble(stringTokenizer.nextToken());
+                spaces[j] = Buildings.createSpace(countRooms, square);
             }
             floors[i] = Buildings.createFloor(spaces);
         }
         return Buildings.createBuilding(floors);
     }
-    public static void  writeBuilding (Building building, Writer out) throws IOException {
-        StringBuilder obj = new StringBuilder();
-        obj.append(building.getCountFloors());
-        for (Floor floor : building.getFloors()) {
-            obj.append(" ").append(floor.getCount());
-            for (Space space : floor.getSpaces()) {
-                obj.append(" ").append(space.getCountRooms()).append(" ").append(format("%.1f", space.getSquare()));
-            }
-        }
-        out.write(obj.toString().replace(',', '.') + "\n");
+
+    public static void writeBuilding(Building building, Writer out) throws IOException {
+        out.write(convertBuildingToString(building));
         out.flush();
     }
-    public static Building readBuilding (Reader in) throws IOException {
+
+    public static Building readBuilding(Reader in) throws IOException {
         StreamTokenizer st = new StreamTokenizer(in);
         st.nextToken();
         Floor[] floors = new Floor[(int) st.nval];

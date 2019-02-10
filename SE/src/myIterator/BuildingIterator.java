@@ -1,13 +1,14 @@
 package myIterator;
 
-import java.util.Iterator;
 import myInterface.Building;
 import myInterface.Floor;
 
-public class BuildingIterator implements Iterator {
+import java.util.Iterator;
+
+public class BuildingIterator implements Iterator<Floor> {
     private final Building building;
     private int index;
-    
+
     public BuildingIterator(Building building) {
         this.building = building;
         this.index = 0;
@@ -20,7 +21,6 @@ public class BuildingIterator implements Iterator {
 
     @Override
     public Floor next() {
-        Floor temp = building.getFloor(index++);
-        return temp;
+        return building.getFloor(index++);
     }
 }
