@@ -1,13 +1,15 @@
 package buildings.net.client;
 
-import java.io.*;
-
 import buildings.Buildings;
+import myFactory.BuildingFactory;
+import myFactory.DwellingFactory;
+import myFactory.HotelFactory;
+import myFactory.OfficeFactory;
+import myInterface.Building;
 
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import myFactory.*;
-import myInterface.Building;
 
 public class BinaryClient {
 
@@ -19,11 +21,11 @@ public class BinaryClient {
 
         File buildingsInfo = new File(args[0]);
         if (!buildingsInfo.exists()) {
-            System.out.println("File with buidings info not found!");
+            System.out.println("File with buildings info not found!");
             System.exit(2);
         }
         File buildingsType = new File(args[1]);
-            if (!buildingsType.exists()) {
+        if (!buildingsType.exists()) {
             System.out.println("File with buildings type not found!");
             System.exit(2);
         }
@@ -33,39 +35,42 @@ public class BinaryClient {
         try (
                 BufferedReader infoReader = new BufferedReader(new FileReader(buildingsInfo));
                 BufferedReader typeReader = new BufferedReader(new FileReader(buildingsType));
-                BufferedWriter costWriter = new BufferedWriter(new FileWriter(buildingsCost));
-                Socket socket = new Socket(InetAddress.getLocalHost(), 11111);
-                InputStream inputStream = socket.getInputStream();
-                OutputStream outputStream = socket.getOutputStream();
-                DataInputStream in = new DataInputStream(inputStream);
-                DataOutputStream out = new DataOutputStream(outputStream)
+                BufferedWriter costWriter = new BufferedWriter(new FileWriter(buildingsCost))
         ) {
             String buildingType;
             while ((buildingType = typeReader.readLine()) != null) {
-                switch (buildingType) {
-                    case "Dwelling":
-                        Buildings.setBuildingFactory(new DwellingFactory());
-                        break;
-                    case "OfficeBuilding":
-                        Buildings.setBuildingFactory(new OfficeFactory());
-                        break;
-                    case "Hotel":
-                        Buildings.setBuildingFactory(new HotelFactory());
-                        break;
-                }
-                String buildingInfo = infoReader.readLine();
-                System.out.println("Read info about building: " + buildingInfo);
-                Building building = Buildings.readBuilding(new StringReader(buildingInfo));
+                try (
+                        Socket socket = new Socket(InetAddress.getLocalHost(), 11111);
+                        DataInputStream in = new DataInputStream(socket.getInputStream());
+                        DataOutputStream out = new DataOutputStream(socket.getOutputStream())
+                ) {
+                    BuildingFactory buildingFactory = new DwellingFactory();
+                    switch (buildingType) {
+                        case "Dwelling":
+                            buildingFactory = new DwellingFactory();
+                            break;
+                        case "OfficeBuilding":
+                            buildingFactory = new OfficeFactory();
+                            break;
+                        case "Hotel":
+                            buildingFactory = new HotelFactory();
+                            break;
+                    }
+                    Buildings.setBuildingFactory(buildingFactory);
+                    String buildingInfo = infoReader.readLine();
+                    System.out.println("Read info about building: " + buildingInfo);
+                    Building building = Buildings.readBuilding(new StringReader(buildingInfo));
 
-                System.out.println("Sending building type: " + buildingType);
-                out.writeUTF(buildingType);
-                System.out.println("Sending building:\n" + building.toString());
-                Buildings.outputBuilding(building, outputStream);
-                System.out.println("Waiting cost for building...");
-                String buildingCost = in.readUTF();
-                System.out.println("Read cost: " + buildingCost);
-                costWriter.write(buildingCost);
-                costWriter.newLine();
+                    System.out.println("Sending building type: " + buildingType);
+                    out.writeUTF(buildingType);
+                    System.out.println("Sending building:\n" + building.toString());
+                    Buildings.outputBuilding(building, out);
+                    System.out.println("Waiting cost for building...");
+                    double buildingCost = in.readDouble();
+                    System.out.println("Read cost: " + buildingCost);
+                    costWriter.write(String.valueOf(buildingCost));
+                    costWriter.newLine();
+                }
             }
         }
     }

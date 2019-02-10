@@ -2,7 +2,9 @@ package buildings;
 
 import myFactory.BuildingFactory;
 import myFactory.DwellingFactory;
-import myInterface.*;
+import myInterface.Building;
+import myInterface.Floor;
+import myInterface.Space;
 
 import java.io.*;
 import java.util.StringTokenizer;
@@ -57,17 +59,14 @@ public class Buildings {
     }
 
     public static void outputBuilding(Building building, OutputStream out) throws IOException {
-        out.write(convertBuildingToString(building).getBytes());
-        out.flush();
+        DataOutputStream destinationOut = new DataOutputStream(out);
+        destinationOut.writeUTF(convertBuildingToString(building));
+        destinationOut.flush();
     }
 
     public static Building inputBuilding(InputStream in) throws IOException {
-        StringBuilder temp = new StringBuilder();
-        int n;
-        while ((n = in.read()) != -1) {
-            temp.append((char) n);
-        }
-        StringTokenizer stringTokenizer = new StringTokenizer(temp.toString());
+        String building = new DataInputStream(in).readUTF();
+        StringTokenizer stringTokenizer = new StringTokenizer(building); //temp.toString());
         Floor[] floors = new Floor[Integer.parseInt(stringTokenizer.nextToken())];
         for (int i = 0; i < floors.length; i++) {
             Space[] spaces = new Space[Integer.parseInt(stringTokenizer.nextToken())];
